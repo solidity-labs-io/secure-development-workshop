@@ -1,0 +1,20 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+remappings = [
+    "@forge-proposal-simulator=lib/forge-proposal-simulator/",
+    "@addresses/=lib/forge-proposal-simulator/addresses/",
+    "@examples/=lib/forge-proposal-simulator/examples/",
+    "@forge-std/=lib/forge-proposal-simulator/lib/forge-std/src/",
+    "@interface/=lib/forge-proposal-simulator/src/interface/",
+    "@mocks/=lib/forge-proposal-simulator/mocks/",
+    "@proposals/=lib/forge-proposal-simulator/src/proposals/",
+    "@script/=lib/forge-proposal-simulator/script/",
+    "@test/=lib/forge-proposal-simulator/test/",
+    "@utils/=lib/forge-proposal-simulator/utils/",
+    "forge-proposal-simulator/=lib/forge-proposal-simulator/",
+    "forge-std/=lib/forge-proposal-simulator/lib/forge-std/src/",
+]
+
+# See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
