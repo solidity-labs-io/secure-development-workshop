@@ -9,13 +9,23 @@ import {Vault} from "src/examples/00/Vault.sol";
 import {MockToken} from "@mocks/MockToken.sol";
 import {ForkSelector, ETHEREUM_FORK_ID} from "@test/utils/Forks.sol";
 
-/// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/proposals/sips/SIP_00.sol:SIP_00 -vvvv
-contract SIP_00 is GovernorBravoProposal {
+/// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/proposals/sips/SIP00.sol:SIP00 -vvvv
+contract SIP00 is GovernorBravoProposal {
     using ForkSelector for uint256;
 
     constructor() {
         // ETHEREUM_FORK_ID.createForksAndSelect();
         primaryForkId = ETHEREUM_FORK_ID;
+    }
+
+    function setupProposal() public {
+        ETHEREUM_FORK_ID.createForksAndSelect();
+
+        string memory addressesFolderPath = "./addresses";
+        uint256[] memory chainIds = new uint256[](1);
+        chainIds[0] = 1;
+
+        setAddresses(new Addresses(addressesFolderPath, chainIds));
     }
 
     function name() public pure override returns (string memory) {
@@ -27,21 +37,15 @@ contract SIP_00 is GovernorBravoProposal {
     }
 
     function run() public override {
-        ETHEREUM_FORK_ID.createForksAndSelect();
-        
-        string memory addressesFolderPath = "./addresses";
-        uint256[] memory chainIds = new uint256[](1);
-        chainIds[0] = 1;
-        
-        setAddresses(new Addresses(addressesFolderPath, chainIds));
-        
+        setupProposal();
+
         setGovernor(addresses.getAddress("COMPOUND_GOVERNOR_BRAVO"));
-        
+
         super.run();
     }
 
     function deploy() public override {
-        if (!addresses.isAddressSet("OZ_GOVERNOR_VAULT")) {
+        if (!addresses.isAddressSet("V1_VAULT")) {
             address[] memory tokens = new address[](3);
             tokens[0] = addresses.getAddress("USDC");
             tokens[1] = addresses.getAddress("DAI");
