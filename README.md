@@ -1,66 +1,44 @@
-## Foundry
+# Secure Development Workshop
 
-**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
+This workshop will walk you through the basics of securing smart contracts by testing your deployment scripts and governance proposals. We will be using the [forge proposal simulator](https://github.com/solidity-labs-io/forge-proposal-simulator) to make this process easier.
 
-Foundry consists of:
+## Overview
 
--   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
--   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
--   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
--   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
+In this workshop we will be protecting a governance heavy application from the consequences of malicious upgrades and or deployment scripts.
 
-## Documentation
+## Bug Types
+- **Deployment** - Incorrect parameters, caught with a validation
+- **Deployment** - Incorrect parameters, caught with an integration test
+****
+- **Upgrade** - Storage offset changes, caught with an integration test, also caught with a validation
+- **Upgrade** - Logic error, caught with an integration test
+****
+- **New contract** - Logic error, caught with formal verification
+- **New contract** - Vulnerable to DoS vector, caught with static analysis
+- **New contract** - Vulnerable to arbitrary calldata and targets, caught with static analysis
 
-https://book.getfoundry.sh/
+### Further Reading
 
-## Usage
+For governance safety assistance, refer to our [forge proposal simulator](https://github.com/solidity-labs-io/forge-proposal-simulator) tool. See the [security checklist](https://github.com/solidity-labs-io/code-review-checklist) and [security](https://medium.com/@elliotfriedman3/a-security-stack-4aedd8617e8b) [stack](https://medium.com/@elliotfriedman3/a-security-stack-part-2-aaacbbf77346) for a list of items to consider when building a smart contract system.
 
-### Build
+## Environment Setup
 
-```shell
-$ forge build
+Set the `ETH_RPC_URL` environment variable to the URL of an Ethereum node. For example, to use the Alchemy mainnet node, run: 
+
+```bash
+export ETH_RPC_URL=https://eth-mainnet.alchemyapi.io/v2/your-api-key
 ```
 
-### Test
+Make sure the latest version of foundry is installed. If not, run:
 
-```shell
-$ forge test
+```bash
+foundryup
 ```
 
-### Format
+Later exercises will use the certora prover. If you need to install, first check the system prerequisites from the Certora documentation. https://docs.certora.com/en/latest/docs/user-guide/install.html
 
-```shell
-$ forge fmt
-```
+To install the prover run:
 
-### Gas Snapshots
-
-```shell
-$ forge snapshot
-```
-
-### Anvil
-
-```shell
-$ anvil
-```
-
-### Deploy
-
-```shell
-$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
-```
-
-### Cast
-
-```shell
-$ cast <subcommand>
-```
-
-### Help
-
-```shell
-$ forge --help
-$ anvil --help
-$ cast --help
+```bash
+pip3 install certora-cli
 ```
