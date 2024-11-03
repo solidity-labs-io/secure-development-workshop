@@ -106,12 +106,6 @@ contract ProposalsMap is Script {
         vm.selectFork(proposal.primaryForkId());
 
         address deployer = address(proposal);
-        proposal.initProposal(addresses);
-        proposal.deploy(addresses, deployer);
-        proposal.afterDeploy(addresses, deployer);
-        proposal.build(addresses);
-        proposal.teardown(addresses, deployer);
-        proposal.run(addresses, deployer);
-        proposal.validate(addresses, deployer);
+        proposal.run();
     }
 }
