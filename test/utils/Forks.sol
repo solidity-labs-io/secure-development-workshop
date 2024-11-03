@@ -1,6 +1,5 @@
 pragma solidity ^0.8.0;
 
-import {console} from "@forge-std/console.sol";
 import {Vm} from "@forge-std/Vm.sol";
 
 uint256 constant ETHEREUM_FORK_ID = 0;
@@ -18,10 +17,7 @@ library ForkSelector {
 
         if (!successSwitchFork || !success) {
             vmContract.createSelectFork("ethereum");
-            console.log("Fork created, chainid: ", block.chainid);
-            console.log("block number: ", block.number);
         } else {
-            console.log("Fork already exists, chainid: ", block.chainid);
             vmContract.selectFork(selectFork);
         }
     }
