@@ -11,10 +11,20 @@ remappings = [
     "@mocks/=lib/forge-proposal-simulator/mocks/",
     "@proposals/=lib/forge-proposal-simulator/src/proposals/",
     "@script/=lib/forge-proposal-simulator/script/",
-    "@test/=lib/forge-proposal-simulator/test/",
+    "@test/=test/",
     "@utils/=lib/forge-proposal-simulator/utils/",
     "forge-proposal-simulator/=lib/forge-proposal-simulator/",
     "forge-std/=lib/forge-proposal-simulator/lib/forge-std/src/",
+    "@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/",
 ]
+fs_permissions = [{ access = "read", path = "./addresses/"}]
+
+[fmt]
+line_length = 80
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
+
+[rpc_endpoints]
+localhost = "http://127.0.0.1:8545"
+sepolia = "${SEPOLIA_RPC_URL}"
+ethereum = "${ETH_RPC_URL}"
