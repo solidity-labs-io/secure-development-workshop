@@ -1,0 +1,133 @@
+pragma solidity ^0.8.0;
+
+import {console} from "@forge-std/console.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {Test} from "@forge-std/Test.sol";
+
+import {Vault} from "src/examples/00/Vault.sol";
+import {SIP00} from "src/proposals/sips/SIP00.sol";
+
+contract TestSIP00 is Test, SIP00 {
+    Vault public vault;
+
+    /// @notice user addresses
+    address public immutable userA = address(1111);
+    address public immutable userB = address(2222);
+    address public immutable userC = address(3333);
+
+    /// @notice token addresses
+    address public dai;
+    address public usdc;
+    address public usdt;
+
+    function setUp() public {
+        /// set the environment variables
+        vm.setEnv("DO_RUN", "false");
+        vm.setEnv("DO_BUILD", "false");
+        vm.setEnv("DO_DEPLOY", "true");
+        vm.setEnv("DO_SIMULATE", "false");
+        vm.setEnv("DO_PRINT", "false");
+        vm.setEnv("DO_VALIDATE", "true");
+
+        /// setup the proposal
+        setupProposal();
+
+        /// run the proposal
+        deploy();
+
+        /// validate the proposal
+        validate();
+
+        dai = addresses.getAddress("DAI");
+        usdc = addresses.getAddress("USDC");
+        usdt = addresses.getAddress("USDT");
+        vault = Vault(addresses.getAddress("V1_VAULT"));
+    }
+
+    function testVaultDepositDai() public {
+        uint256 daiDepositAmount = 1_000e18;
+
+        _vaultDeposit(dai, daiDepositAmount);
+    }
+
+    function testVaultDepositUsdc() public {
+        uint256 usdcDepositAmount = 1_000e6;
+
+        _vaultDeposit(usdc, usdcDepositAmount);
+    }
+
+    function testVaultDepositUsdt() public {
+        uint256 usdtDepositAmount = 1_000e6;
+
+        deal(usdt, address(this), usdtDepositAmount);
+
+        USDT(usdt).approve(addresses.getAddress("V1_VAULT"), usdtDepositAmount);
+
+        /// this executes 3 state transitions:
+        ///     1. deposit dai into the vault
+        ///     2. increase the user's balance in the vault
+        ///     3. increase the total supplied amount in the vault
+        vault.deposit(usdt, usdtDepositAmount);
+
+        assertEq(
+            vault.balanceOf(address(this)),
+            usdtDepositAmount,
+            "vault token balance not increased"
+        );
+        assertEq(
+            vault.totalSupplied(), usdtDepositAmount, "vault total supplied not increased"
+        );
+        assertEq(
+            IERC20(usdt).balanceOf(address(vault)),
+            usdtDepositAmount,
+            "token balance not increased"
+        );
+    }
+
+    function testVaultWithdrawalDai() public {
+        uint256 daiDepositAmount = 1_000e18;
+
+        _vaultDeposit(dai, daiDepositAmount);
+
+        vault.withdraw(dai, daiDepositAmount);
+
+        assertEq(vault.balanceOf(address(this)), 0, "vault dai balance not 0");
+        assertEq(vault.totalSupplied(), 0, "vault total supplied not 0");
+        assertEq(
+            IERC20(dai).balanceOf(address(this)),
+            daiDepositAmount,
+            "user's dai balance not increased"
+        );
+    }
+
+    function _vaultDeposit(address token, uint256 amount) private {
+        deal(token, address(this), amount);
+
+        IERC20(token).approve(addresses.getAddress("V1_VAULT"), amount);
+
+        /// this executes 3 state transitions:
+        ///     1. deposit dai into the vault
+        ///     2. increase the user's balance in the vault
+        ///     3. increase the total supplied amount in the vault
+        vault.deposit(token, amount);
+
+        assertEq(
+            vault.balanceOf(address(this)),
+            amount,
+            "vault token balance not increased"
+        );
+        assertEq(
+            vault.totalSupplied(), amount, "vault total supplied not increased"
+        );
+        assertEq(
+            IERC20(token).balanceOf(address(vault)),
+            amount,
+            "token balance not increased"
+        );
+    }
+}
+
+interface USDT {
+    function approve(address spender, uint256 amount) external;
+    function transferFrom(address _from, address _to, uint _value) external;
+}
