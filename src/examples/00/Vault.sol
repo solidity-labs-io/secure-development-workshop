@@ -37,6 +37,8 @@ contract Vault {
         address indexed token, address indexed sender, uint256 amount
     );
 
+    /// @notice Construct the vault with a list of authorized tokens
+    /// @param _tokens The list of authorized tokens
     constructor(address[] memory _tokens) {
         for (uint256 i = 0; i < _tokens.length; i++) {
             authorizedToken[_tokens[i]] = true;
@@ -53,8 +55,9 @@ contract Vault {
         /// as all deposited tokens are whitelisted
         unchecked {
             balanceOf[msg.sender] += amount;
-            totalSupplied += amount;
         }
+
+        totalSupplied += amount;
 
         IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
 
