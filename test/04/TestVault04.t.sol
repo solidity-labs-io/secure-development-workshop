@@ -6,9 +6,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Test} from "@forge-std/Test.sol";
 
 import {Vault04} from "src/examples/04/vault04.sol";
-import {SIP02IncorrectUpgrade} from "src/proposals/sips/SIP02IncorrectUpgrade.sol";
+import {SIP02} from "src/proposals/sips/SIP02.sol";
 
-contract TestVault04 is Test, SIP02IncorrectUpgrade {
+contract TestVault04 is Test, SIP02 {
     using SafeERC20 for IERC20;
 
     Vault04 public vault;

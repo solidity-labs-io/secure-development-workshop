@@ -14,8 +14,8 @@ import {ERC1967Utils} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.s
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 
-/// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/proposals/sips/SIP02IncorrectUpgrade.sol:SIP02IncorrectUpgrade -vvvv
-contract SIP02IncorrectUpgrade is GovernorBravoProposal {
+/// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/proposals/sips/SIP02.sol:SIP02 -vvvv
+contract SIP02 is GovernorBravoProposal {
     using ForkSelector for uint256;
 
     constructor() {
@@ -34,7 +34,7 @@ contract SIP02IncorrectUpgrade is GovernorBravoProposal {
     }
 
     function name() public pure override returns (string memory) {
-        return "SIP-02 Incorrect Upgrade";
+        return "SIP-02 Upgrade";
     }
 
     function description() public pure override returns (string memory) {
