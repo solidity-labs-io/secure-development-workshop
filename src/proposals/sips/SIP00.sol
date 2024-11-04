@@ -5,7 +5,7 @@ import {GovernorBravoProposal} from
     "@forge-proposal-simulator/src/proposals/GovernorBravoProposal.sol";
 import {Addresses} from "@forge-proposal-simulator/addresses/Addresses.sol";
 
-import {Vault} from "src/examples/00/Vault.sol";
+import {Vault} from "src/examples/00/Vault00.sol";
 import {MockToken} from "@mocks/MockToken.sol";
 import {ForkSelector, ETHEREUM_FORK_ID} from "@test/utils/Forks.sol";
 

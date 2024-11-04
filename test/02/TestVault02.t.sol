@@ -9,7 +9,7 @@ import {Test} from "@forge-std/Test.sol";
 import {Vault} from "src/examples/00/Vault00.sol";
 import {SIP00} from "src/proposals/sips/SIP00.sol";
 
-contract TestSIP00 is Test, SIP00 {
+contract TestVault02 is Test, SIP00 {
     using SafeERC20 for IERC20;
 
     Vault public vault;

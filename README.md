@@ -7,15 +7,12 @@ This workshop will walk you through the basics of securing smart contracts by te
 In this workshop we will be protecting a governance heavy application from the consequences of malicious upgrades and or deployment scripts.
 
 ## Bug Types
-- **Deployment** - Incorrect parameters, caught with a validation
-- **Deployment** - Incorrect parameters, caught with an integration test
+- **Deployment** - Incorrect parameters, caught with a validation 
+- **Deployment** - Incorrect parameters, caught with an integration test ✓
 ****
 - **Upgrade** - Storage offset changes, caught with an integration test, also caught with a validation
 - **Upgrade** - Logic error, caught with an integration test
 ****
-- **New contract** - Logic error, caught with formal verification
-- **New contract** - Vulnerable to DoS vector, caught with static analysis
-- **New contract** - Vulnerable to arbitrary calldata and targets, caught with static analysis
 
 ### Further Reading
 

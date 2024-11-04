@@ -96,7 +96,7 @@ contract ProposalsMap is Script {
         }
     }
 
-    function runProposal(Addresses addresses, string memory proposalPath)
+    function runProposal(string memory proposalPath)
         public
         returns (Proposal proposal)
     {
@@ -105,7 +105,6 @@ contract ProposalsMap is Script {
 
         vm.selectFork(proposal.primaryForkId());
 
-        address deployer = address(proposal);
         proposal.run();
     }
 }
