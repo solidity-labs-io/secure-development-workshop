@@ -196,7 +196,7 @@ contract Vault is VaultStoragePausable {
         uint8 decimals = IERC20Metadata(token).decimals();
         normalizedAmount = amount;
         if (decimals < 18) {
-            normalizedAmount = amount ** (10 * (18 - decimals));
+            normalizedAmount = amount * (10 ** (18 - decimals));
         }
     }
 }

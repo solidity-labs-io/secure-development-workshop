@@ -34,10 +34,11 @@ contract SIP04 is GovernorBravoProposal {
         chainIds[0] = 1;
 
         setAddresses(new Addresses(addressesFolderPath, chainIds));
+        setGovernor(addresses.getAddress("COMPOUND_GOVERNOR_BRAVO"));
     }
 
     function name() public pure override returns (string memory) {
-        return "SIP-03 Upgrade";
+        return "SIP-04";
     }
 
     function description()
@@ -46,7 +47,7 @@ contract SIP04 is GovernorBravoProposal {
         override
         returns (string memory)
     {
-        return name();
+        return "Upgrade to V4 Vault Implementation";
     }
 
     function run() public override {
@@ -80,7 +81,7 @@ contract SIP04 is GovernorBravoProposal {
         // upgrade to new implementation
         ProxyAdmin(proxyAdmin).upgradeAndCall(
             ITransparentUpgradeableProxy(vaultProxy),
-            addresses.getAddress("V4_VAULT_IMPLEMENTATION"),
+            addresses.getAddress("V4_VAULT_IMPL"),
             ""
         );
 

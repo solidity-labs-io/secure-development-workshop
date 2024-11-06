@@ -3,12 +3,13 @@ pragma solidity ^0.8.0;
 import {SafeERC20} from
     "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {Test} from "@forge-std/Test.sol";
+import {Test, console} from "@forge-std/Test.sol";
 
-import {SIP02} from "src/exercises/02/SIP02.sol";
+import {SIP03} from "src/exercises/03/SIP03.sol";
+import {SIP04} from "src/exercises/04/SIP04.sol";
 import {Vault} from "src/exercises/04/Vault04.sol";
 
-contract TestVault04 is Test, SIP02 {
+contract TestVault04 is Test, SIP04 {
     using SafeERC20 for IERC20;
 
     Vault public vault;
@@ -32,13 +33,25 @@ contract TestVault04 is Test, SIP02 {
         vm.setEnv("DO_PRINT", "false");
         vm.setEnv("DO_VALIDATE", "false");
 
+        SIP03 sip03 = new SIP03();
+
+        sip03.setupProposal();
+        sip03.deploy();
+
         /// setup the proposal
         setupProposal();
+
+        /// copy SIP03 addresses into this contract for integration testing
+        setAddresses(sip03.addresses());
 
         /// run the proposal
         vm.startPrank(addresses.getAddress("DEPLOYER_EOA"));
         deploy();
         vm.stopPrank();
+
+        /// build and run proposal
+        build();
+        simulate();
 
         dai = addresses.getAddress("DAI");
         usdc = addresses.getAddress("USDC");
@@ -76,7 +89,9 @@ contract TestVault04 is Test, SIP02 {
 
     function testWithdrawAlreadyDepositedUSDC() public {
         uint256 usdcDepositAmount = 1_000e6;
+
         _vaultDeposit(usdc, address(this), usdcDepositAmount);
+
         vault.withdraw(usdc, usdcDepositAmount);
     }
 
