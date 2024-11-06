@@ -2,7 +2,6 @@ pragma solidity ^0.8.0;
 
 import {SafeERC20} from
     "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import {console} from "@forge-std/console.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Test} from "@forge-std/Test.sol";
 
@@ -79,10 +78,6 @@ contract TestVault02 is Test, SIP02 {
             addresses.getAddress("V2_VAULT"), usdtDepositAmount
         );
 
-        /// this executes 3 state transitions:
-        ///     1. deposit dai into the vault
-        ///     2. increase the user's balance in the vault
-        ///     3. increase the total supplied amount in the vault
         vault.deposit(usdt, usdtDepositAmount);
 
         assertEq(
@@ -141,6 +136,11 @@ contract TestVault02 is Test, SIP02 {
 
         vm.prank(userB);
         vault.withdraw(usdc, usdcDepositAmount);
+        assertEq(
+            IERC20(usdc).balanceOf(userB),
+            usdcDepositAmount,
+            "userB usdc balance not increased"
+        );
         assertEq(
             IERC20(usdt).balanceOf(userA),
             usdcDepositAmount,
