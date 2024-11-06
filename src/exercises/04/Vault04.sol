@@ -12,14 +12,8 @@ import {VaultStoragePausable} from
     "src/exercises/storage/VaultStoragePausable.sol";
 
 /// @notice Add maxsupply to the vault and update getNormalizedAmount logic
-/// TODO make pauseable
-/// make totalSupplied offsets the same
-/// inherit pausable to mess up the storage slot offsets
-/// add governance proposal that deploys and ugprades the existing vault from
-/// proposal 03
-/// deploy Vault 03 to mainnet
-/// add integration tests
-contract Vault05 is VaultStoragePausable {
+/// allows pausing by owner
+contract Vault is VaultStoragePausable {
     using SafeERC20 for IERC20;
 
     /// @notice Deposit event
@@ -105,6 +99,18 @@ contract Vault05 is VaultStoragePausable {
 
         /// only read stack variables, save a warm SLOAD
         emit MaxSupplyUpdated(previousMaxSupply, newMaxSupply);
+    }
+
+    /// @notice pauses the contract, callable only by the owner
+    /// and when the contract is unpaused
+    function pause() external onlyOwner whenNotPaused {
+        _pause();
+    }
+
+    /// @notice unpauses the contract, callable only by the owner
+    /// and when the contract is paused
+    function unpause() external onlyOwner whenPaused {
+        _unpause();
     }
 
     /// -------------------------------------------------------------

@@ -6,12 +6,12 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Test} from "@forge-std/Test.sol";
 
 import {SIP02} from "src/exercises/02/SIP02.sol";
-import {Vault04} from "src/exercises/04/Vault04.sol";
+import {Vault} from "src/exercises/04/Vault04.sol";
 
 contract TestVault04 is Test, SIP02 {
     using SafeERC20 for IERC20;
 
-    Vault04 public vault;
+    Vault public vault;
 
     /// @notice user addresses
     address public immutable userA = address(1111);
@@ -43,7 +43,7 @@ contract TestVault04 is Test, SIP02 {
         dai = addresses.getAddress("DAI");
         usdc = addresses.getAddress("USDC");
         usdt = addresses.getAddress("USDT");
-        vault = Vault04(addresses.getAddress("VAULT_PROXY"));
+        vault = Vault(addresses.getAddress("VAULT_PROXY"));
     }
 
     function testVaultDepositDai() public {

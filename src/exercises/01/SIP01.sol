@@ -7,7 +7,6 @@ import {Addresses} from
     "@forge-proposal-simulator/addresses/Addresses.sol";
 
 import {Vault} from "src/exercises/01/Vault01.sol";
-import {MockToken} from "@mocks/MockToken.sol";
 import {ForkSelector, ETHEREUM_FORK_ID} from "@test/utils/Forks.sol";
 
 /// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/exercises/01/SIP01.sol:SIP01 -vvvv

@@ -7,7 +7,6 @@ import {Addresses} from
     "@forge-proposal-simulator/addresses/Addresses.sol";
 
 import {Vault} from "src/exercises/00/Vault00.sol";
-import {MockToken} from "@mocks/MockToken.sol";
 import {ForkSelector, ETHEREUM_FORK_ID} from "@test/utils/Forks.sol";
 
 /// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/exercises/00/SIP00.sol:SIP00 -vvvv
@@ -50,7 +49,7 @@ contract SIP00 is GovernorBravoProposal {
     }
 
     function deploy() public override {
-        if (!addresses.isAddressSet("V1_VAULT")) {
+        if (!addresses.isAddressSet("V0_VAULT")) {
             address[] memory tokens = new address[](3);
             tokens[0] = addresses.getAddress("USDC");
             tokens[1] = addresses.getAddress("DAI");
@@ -58,12 +57,12 @@ contract SIP00 is GovernorBravoProposal {
 
             Vault vault = new Vault(tokens);
 
-            addresses.addAddress("V1_VAULT", address(vault), true);
+            addresses.addAddress("V0_VAULT", address(vault), true);
         }
     }
 
     function validate() public view override {
-        Vault vault = Vault(addresses.getAddress("V1_VAULT"));
+        Vault vault = Vault(addresses.getAddress("V0_VAULT"));
 
         assertEq(
             vault.authorizedToken(addresses.getAddress("USDC")),

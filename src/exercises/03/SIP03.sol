@@ -6,9 +6,6 @@ import {GovernorBravoProposal} from
 import {Addresses} from
     "@forge-proposal-simulator/addresses/Addresses.sol";
 
-import {Vault04} from "src/exercises/04/Vault04.sol";
-import {MockToken} from "@mocks/MockToken.sol";
-import {ForkSelector, ETHEREUM_FORK_ID} from "@test/utils/Forks.sol";
 import {
     ProxyAdmin,
     TransparentUpgradeableProxy,
@@ -19,8 +16,11 @@ import {ERC1967Utils} from
     "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/exercises/SIP04.sol:SIP04 -vvvv
-contract SIP04 is GovernorBravoProposal {
+import {Vault} from "src/exercises/03/Vault03.sol";
+import {ForkSelector, ETHEREUM_FORK_ID} from "@test/utils/Forks.sol";
+
+/// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/exercises/03/SIP03.sol:SIP03 -vvvv
+contract SIP03 is GovernorBravoProposal {
     using ForkSelector for uint256;
 
     constructor() {
@@ -38,7 +38,7 @@ contract SIP04 is GovernorBravoProposal {
     }
 
     function name() public pure override returns (string memory) {
-        return "SIP-04 Upgrade";
+        return "SIP-03 Upgrade";
     }
 
     function description()
@@ -59,45 +59,45 @@ contract SIP04 is GovernorBravoProposal {
     }
 
     function deploy() public override {
-        if (!addresses.isAddressSet("PROXY_ADMIN")) {
-            ProxyAdmin proxyAdmin = new ProxyAdmin();
-            proxyAdmin.transferOwnership(
-                addresses.getAddress("COMPOUND_TIMELOCK_BRAVO")
-            );
-
-            addresses.addAddress("PROXY_ADMIN", address(proxyAdmin), true);
-        }
-
         address vaultProxy;
-        if (!addresses.isAddressSet("V4_VAULT_IMPLEMENTATION")) {
-            address vaultImpl = address(new Vault04());
-            addresses.addAddress(
-                "V4_VAULT_IMPLEMENTATION", vaultImpl, true
-            );
+        if (!addresses.isAddressSet("V3_VAULT_IMPL")) {
+            address vaultImpl = address(new Vault());
+            addresses.addAddress("V3_VAULT_IMPL", vaultImpl, true);
 
             address[] memory tokens = new address[](3);
             tokens[0] = addresses.getAddress("USDC");
             tokens[1] = addresses.getAddress("DAI");
             tokens[2] = addresses.getAddress("USDT");
 
-            address owner = addresses.getAddress("COMPOUND_TIMELOCK_BRAVO");
+            address owner =
+                addresses.getAddress("COMPOUND_TIMELOCK_BRAVO");
 
             // Generate calldata for initialize function of vault
             bytes memory data = abi.encodeWithSignature(
                 "initialize(address[],address)", tokens, owner
             );
 
+            /// proxy admin contract is created by the Transparent Upgradeable Proxy
             vaultProxy = address(
                 new TransparentUpgradeableProxy(
                     vaultImpl, owner, data
                 )
             );
             addresses.addAddress("VAULT_PROXY", vaultProxy, true);
+
+            address proxyAdmin = address(
+                uint160(
+                    uint256(
+                        vm.load(vaultProxy, ERC1967Utils.ADMIN_SLOT)
+                    )
+                )
+            );
+            addresses.addAddress("PROXY_ADMIN", proxyAdmin, true);
         }
     }
 
     function validate() public view override {
-        Vault04 vault = Vault04(addresses.getAddress("VAULT_PROXY"));
+        Vault vault = Vault(addresses.getAddress("VAULT_PROXY"));
 
         assertEq(
             vault.authorizedToken(addresses.getAddress("USDC")),
@@ -120,5 +120,11 @@ contract SIP04 is GovernorBravoProposal {
             vm.load(vaultProxy, ERC1967Utils.ADMIN_SLOT);
 
         address proxyAdmin = address(uint160(uint256(adminSlot)));
+
+        assertEq(
+            ProxyAdmin(proxyAdmin).owner(),
+            addresses.getAddress("COMPOUND_TIMELOCK_BRAVO"),
+            "owner not set"
+        );
     }
 }

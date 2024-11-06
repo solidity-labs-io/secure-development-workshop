@@ -43,7 +43,7 @@ contract TestVault00 is Test, SIP00 {
         dai = addresses.getAddress("DAI");
         usdc = addresses.getAddress("USDC");
         usdt = addresses.getAddress("USDT");
-        vault = Vault(addresses.getAddress("V1_VAULT"));
+        vault = Vault(addresses.getAddress("V0_VAULT"));
     }
 
     function testValidate() public view {
@@ -77,7 +77,7 @@ contract TestVault00 is Test, SIP00 {
         deal(usdt, address(this), usdtDepositAmount);
 
         USDT(usdt).approve(
-            addresses.getAddress("V1_VAULT"), usdtDepositAmount
+            addresses.getAddress("V0_VAULT"), usdtDepositAmount
         );
 
         /// this executes 3 state transitions:
@@ -163,7 +163,7 @@ contract TestVault00 is Test, SIP00 {
 
         vm.startPrank(sender);
         IERC20(token).safeIncreaseAllowance(
-            addresses.getAddress("V1_VAULT"), amount
+            addresses.getAddress("V0_VAULT"), amount
         );
 
         /// this executes 3 state transitions:

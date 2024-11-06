@@ -6,10 +6,10 @@ import {console} from "@forge-std/console.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Test} from "@forge-std/Test.sol";
 
-import {Vault} from "src/exercises/00/Vault00.sol";
-import {SIP00} from "src/exercises/00/SIP00.sol";
+import {Vault} from "src/exercises/02/Vault02.sol";
+import {SIP02} from "src/exercises/02/SIP02.sol";
 
-contract TestVault02 is Test, SIP00 {
+contract TestVault02 is Test, SIP02 {
     using SafeERC20 for IERC20;
 
     Vault public vault;
@@ -42,7 +42,7 @@ contract TestVault02 is Test, SIP00 {
         dai = addresses.getAddress("DAI");
         usdc = addresses.getAddress("USDC");
         usdt = addresses.getAddress("USDT");
-        vault = Vault(addresses.getAddress("V1_VAULT"));
+        vault = Vault(addresses.getAddress("V2_VAULT"));
     }
 
     function testValidate() public view {
@@ -76,7 +76,7 @@ contract TestVault02 is Test, SIP00 {
         deal(usdt, address(this), usdtDepositAmount);
 
         USDT(usdt).approve(
-            addresses.getAddress("V1_VAULT"), usdtDepositAmount
+            addresses.getAddress("V2_VAULT"), usdtDepositAmount
         );
 
         /// this executes 3 state transitions:
@@ -162,7 +162,7 @@ contract TestVault02 is Test, SIP00 {
 
         vm.startPrank(sender);
         IERC20(token).safeIncreaseAllowance(
-            addresses.getAddress("V1_VAULT"), amount
+            addresses.getAddress("V2_VAULT"), amount
         );
 
         /// this executes 3 state transitions:
@@ -172,14 +172,17 @@ contract TestVault02 is Test, SIP00 {
         vault.deposit(token, amount);
         vm.stopPrank();
 
+        uint256 normalizedAmount =
+            vault.getNormalizedAmount(token, amount);
+
         assertEq(
             vault.balanceOf(sender),
-            startingUserBalance + amount,
+            startingUserBalance + normalizedAmount,
             "user vault balance not increased"
         );
         assertEq(
             vault.totalSupplied(),
-            startingTotalSupplied + amount,
+            startingTotalSupplied + normalizedAmount,
             "vault total supplied not increased by deposited amount"
         );
         assertEq(

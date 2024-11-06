@@ -10,14 +10,9 @@ import {VaultStorageOwnable} from
     "src/exercises/storage/VaultStorageOwnable.sol";
 
 /// @notice Add maxsupply to the vault and update getNormalizedAmount logic
-/// TODO make pauseable
-/// make totalSupplied offsets the same
-/// inherit pausable to mess up the storage slot offsets
-/// add governance proposal that deploys and ugprades the existing vault from
-/// proposal 03
 /// deploy Vault 03 to mainnet
 /// add integration tests
-contract Vault04 is VaultStorageOwnable {
+contract Vault is VaultStorageOwnable {
     using SafeERC20 for IERC20;
 
     /// @notice Deposit event
