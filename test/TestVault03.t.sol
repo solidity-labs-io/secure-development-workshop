@@ -67,12 +67,16 @@ contract TestVault03 is Test, SIP03 {
 
     function testSetup() public view {
         validate();
-        assertEq(vault.maxSupply(), 100_000_000e18, "max supply not set");
+        assertEq(
+            vault.maxSupply(), 100_000_000e18, "max supply not set"
+        );
         assertEq(
             vault.totalSupplied(),
-            (vault.getNormalizedAmount(dai, 1_000e18) +
-                vault.getNormalizedAmount(usdc, 1_000e6) +
-                vault.getNormalizedAmount(usdt, 1_000e8)) * 3,
+            (
+                vault.getNormalizedAmount(dai, 1_000e18)
+                    + vault.getNormalizedAmount(usdc, 1_000e6)
+                    + vault.getNormalizedAmount(usdt, 1_000e8)
+            ) * 3,
             "total supplied not set"
         );
     }
@@ -120,13 +124,14 @@ contract TestVault03 is Test, SIP03 {
 
         assertEq(
             vault.balanceOf(address(this)),
-            startingVaultBalance -
-                vault.getNormalizedAmount(usdc, usdcDepositAmount),
+            startingVaultBalance
+                - vault.getNormalizedAmount(usdc, usdcDepositAmount),
             "vault usdc balance not 0"
         );
         assertEq(
             vault.totalSupplied(),
-            startingTotalSupplied - vault.getNormalizedAmount(usdc, usdcDepositAmount),
+            startingTotalSupplied
+                - vault.getNormalizedAmount(usdc, usdcDepositAmount),
             "vault total supplied not 0"
         );
         assertEq(
@@ -147,14 +152,14 @@ contract TestVault03 is Test, SIP03 {
 
         assertEq(
             vault.balanceOf(address(this)),
-            startingVaultBalance -
-                vault.getNormalizedAmount(usdt, usdtDepositAmount),
+            startingVaultBalance
+                - vault.getNormalizedAmount(usdt, usdtDepositAmount),
             "vault usdt balance not 0"
         );
         assertEq(
             vault.totalSupplied(),
-            startingTotalSupplied -
-                vault.getNormalizedAmount(usdt, usdtDepositAmount),
+            startingTotalSupplied
+                - vault.getNormalizedAmount(usdt, usdtDepositAmount),
             "vault total supplied not 0"
         );
         assertEq(

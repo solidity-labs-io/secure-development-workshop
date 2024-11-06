@@ -56,7 +56,7 @@ contract TestVault01 is Test, SIP01 {
         _vaultDeposit(usdc, userB, usdcDepositAmount);
         _vaultDeposit(usdc, userC, usdcDepositAmount);
     }
-    
+
     function testVaultWithdrawalUsdc() public {
         uint256 usdcDepositAmount = 1_000e6;
 
@@ -100,7 +100,8 @@ contract TestVault01 is Test, SIP01 {
             vault.totalSupplied(), 0, "vault total supplied not 0"
         );
         assertEq(
-            IERC20(usdt).balanceOf(address(this)), usdtDepositAmount,
+            IERC20(usdt).balanceOf(address(this)),
+            usdtDepositAmount,
             "user's usdt balance not increased"
         );
     }

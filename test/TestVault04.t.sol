@@ -6,7 +6,8 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Test, console} from "@forge-std/Test.sol";
 import {ERC1967Utils} from
     "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
-import {ProxyAdmin} from "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
+import {ProxyAdmin} from
+    "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 import {SIP03} from "src/exercises/03/SIP03.sol";
 import {SIP04} from "src/exercises/04/SIP04.sol";
@@ -80,5 +81,4 @@ contract TestVault04 is Test, SIP04 {
             "owner not set"
         );
     }
-
 }
