@@ -70,6 +70,7 @@ contract SIP04 is GovernorBravoProposal {
         override
         buildModifier(addresses.getAddress("COMPOUND_TIMELOCK_BRAVO"))
     {
+        /// static calls - filtered out
         address vaultProxy = addresses.getAddress("VAULT_PROXY");
         bytes32 adminSlot =
             vm.load(vaultProxy, ERC1967Utils.ADMIN_SLOT);
@@ -114,6 +115,9 @@ contract SIP04 is GovernorBravoProposal {
         bytes32 adminSlot =
             vm.load(vaultProxy, ERC1967Utils.ADMIN_SLOT);
         address proxyAdmin = address(uint160(uint256(adminSlot)));
+
+        /// check not paused
+        /// check logic contract address is v4 impl
 
         assertEq(
             ProxyAdmin(proxyAdmin).owner(),

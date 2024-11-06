@@ -24,6 +24,23 @@ contract TestVault04 is Test, SIP04 {
     address public usdc;
     address public usdt;
 
+    function _loadUsers() private {
+        address[] memory users = new address[](3);
+        users[0] = userA;
+        users[1] = userB;
+        users[2] = userC;
+
+        for (uint256 i = 0; i < users.length; i++) {
+            uint256 daiDepositAmount = 1_000e18;
+            uint256 usdtDepositAmount = 1_000e8;
+            uint256 usdcDepositAmount = 1_000e6;
+
+            _vaultDeposit(dai, users[i], daiDepositAmount);
+            _vaultDeposit(usdc, users[i], usdcDepositAmount);
+            _vaultDeposit(usdt, users[i], usdtDepositAmount);
+        }
+    }
+
     function setUp() public {
         /// set the environment variables
         vm.setEnv("DO_RUN", "false");
@@ -38,10 +55,23 @@ contract TestVault04 is Test, SIP04 {
         sip03.setupProposal();
         sip03.deploy();
 
+        /// set the addresses contrac to the SIP03 addresses for integration testing
+        setAddresses(sip03.addresses());
+        dai = addresses.getAddress("DAI");
+        usdc = addresses.getAddress("USDC");
+        usdt = addresses.getAddress("USDT");
+        vault = Vault(addresses.getAddress("VAULT_PROXY"));
+
+        vm.prank(vault.owner());
+        vault.setMaxSupply(100_000_000e18);
+
+        /// load data into newly deployed contract
+        _loadUsers();
+
         /// setup the proposal
         setupProposal();
 
-        /// copy SIP03 addresses into this contract for integration testing
+        /// overwrite the newly created proposal Addresses contract
         setAddresses(sip03.addresses());
 
         /// deploy contracts from MIP-04
@@ -50,11 +80,20 @@ contract TestVault04 is Test, SIP04 {
         /// build and run proposal
         build();
         simulate();
+    }
 
-        dai = addresses.getAddress("DAI");
-        usdc = addresses.getAddress("USDC");
-        usdt = addresses.getAddress("USDT");
-        vault = Vault(addresses.getAddress("VAULT_PROXY"));
+    function testSetup() public view {
+        assertTrue(
+            vault.authorizedToken(address(dai)), "Dai not whitelisted"
+        );
+        assertTrue(
+            vault.authorizedToken(address(usdc)),
+            "Usdc not whitelisted"
+        );
+        assertTrue(
+            vault.authorizedToken(address(usdt)),
+            "Usdt not whitelisted"
+        );
     }
 
     function testVaultDepositDai() public {
@@ -67,16 +106,20 @@ contract TestVault04 is Test, SIP04 {
         uint256 daiDepositAmount = 1_000e18;
 
         _vaultDeposit(dai, address(this), daiDepositAmount);
+        uint256 startingVaultBalance = vault.balanceOf(address(this));
+        uint256 startingTotalSupplied = vault.totalSupplied();
 
         vault.withdraw(dai, daiDepositAmount);
 
         assertEq(
             vault.balanceOf(address(this)),
-            0,
+            startingVaultBalance - daiDepositAmount,
             "vault dai balance not 0"
         );
         assertEq(
-            vault.totalSupplied(), 0, "vault total supplied not 0"
+            vault.totalSupplied(),
+            startingTotalSupplied - daiDepositAmount,
+            "vault total supplied not 0"
         );
         assertEq(
             IERC20(dai).balanceOf(address(this)),

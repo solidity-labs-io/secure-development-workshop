@@ -10,7 +10,6 @@ import {VaultStorageOwnable} from
     "src/exercises/storage/VaultStorageOwnable.sol";
 
 /// @notice Add maxsupply to the vault and update getNormalizedAmount logic
-/// deploy Vault 03 to mainnet
 /// add integration tests
 contract Vault is VaultStorageOwnable {
     using SafeERC20 for IERC20;
@@ -180,7 +179,7 @@ contract Vault is VaultStorageOwnable {
         uint8 decimals = IERC20Metadata(token).decimals();
         normalizedAmount = amount;
         if (decimals < 18) {
-            normalizedAmount = amount ** (10 * (18 - decimals));
+            normalizedAmount = amount * (10 ** (18 - decimals));
         }
     }
 }
