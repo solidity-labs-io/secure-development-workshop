@@ -44,10 +44,8 @@ contract TestVault04 is Test, SIP04 {
         /// copy SIP03 addresses into this contract for integration testing
         setAddresses(sip03.addresses());
 
-        /// run the proposal
-        vm.startPrank(addresses.getAddress("DEPLOYER_EOA"));
+        /// deploy contracts from MIP-04
         deploy();
-        vm.stopPrank();
 
         /// build and run proposal
         build();
