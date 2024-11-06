@@ -6,12 +6,12 @@ import {GovernorBravoProposal} from
 import {Addresses} from
     "@forge-proposal-simulator/addresses/Addresses.sol";
 
-import {Vault} from "src/exercises/00/Vault00.sol";
+import {Vault} from "src/exercises/01/Vault01.sol";
 import {MockToken} from "@mocks/MockToken.sol";
 import {ForkSelector, ETHEREUM_FORK_ID} from "@test/utils/Forks.sol";
 
-/// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/proposals/sips/SIP00.sol:SIP00 -vvvv
-contract SIP00 is GovernorBravoProposal {
+/// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/exercises/01/SIP01.sol:SIP01 -vvvv
+contract SIP01 is GovernorBravoProposal {
     using ForkSelector for uint256;
 
     constructor() {
@@ -29,7 +29,7 @@ contract SIP00 is GovernorBravoProposal {
     }
 
     function name() public pure override returns (string memory) {
-        return "SIP-00 System Deploy";
+        return "SIP-01 System Deploy";
     }
 
     function description()
@@ -51,10 +51,9 @@ contract SIP00 is GovernorBravoProposal {
 
     function deploy() public override {
         if (!addresses.isAddressSet("V1_VAULT")) {
-            address[] memory tokens = new address[](3);
+            address[] memory tokens = new address[](2);
             tokens[0] = addresses.getAddress("USDC");
-            tokens[1] = addresses.getAddress("DAI");
-            tokens[2] = addresses.getAddress("USDT");
+            tokens[1] = addresses.getAddress("USDT");
 
             Vault vault = new Vault(tokens);
 
@@ -71,14 +70,14 @@ contract SIP00 is GovernorBravoProposal {
             "USDC should be authorized"
         );
         assertEq(
-            vault.authorizedToken(addresses.getAddress("DAI")),
-            true,
-            "DAI should be authorized"
-        );
-        assertEq(
             vault.authorizedToken(addresses.getAddress("USDT")),
             true,
             "USDT should be authorized"
+        );
+        assertEq(
+            vault.authorizedToken(addresses.getAddress("DAI")),
+            true,
+            "DAI should be authorized"
         );
     }
 }

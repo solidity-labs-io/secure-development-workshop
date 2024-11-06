@@ -7,9 +7,9 @@ import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Test} from "@forge-std/Test.sol";
 
 import {Vault} from "src/exercises/00/Vault00.sol";
-import {SIP00} from "src/proposals/sips/SIP00.sol";
+import {SIP00} from "src/exercises/00/SIP00.sol";
 
-contract TestSIP00 is Test, SIP00 {
+contract TestVault02 is Test, SIP00 {
     using SafeERC20 for IERC20;
 
     Vault public vault;
@@ -39,13 +39,15 @@ contract TestSIP00 is Test, SIP00 {
         /// run the proposal
         deploy();
 
-        /// validate the proposal
-        validate();
-
         dai = addresses.getAddress("DAI");
         usdc = addresses.getAddress("USDC");
         usdt = addresses.getAddress("USDT");
         vault = Vault(addresses.getAddress("V1_VAULT"));
+    }
+
+    function testValidate() public view {
+        /// validate the proposal
+        validate();
     }
 
     function testVaultDepositDai() public {

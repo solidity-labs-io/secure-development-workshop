@@ -6,7 +6,7 @@ import {GovernorBravoProposal} from
 import {Addresses} from
     "@forge-proposal-simulator/addresses/Addresses.sol";
 
-import {Vault03} from "src/exercises/03/Vault03.sol";
+import {Vault03} from "src/exercises/03/Vault.sol";
 import {Vault04} from "src/exercises/04/Vault04.sol";
 import {MockToken} from "@mocks/MockToken.sol";
 import {ForkSelector, ETHEREUM_FORK_ID} from "@test/utils/Forks.sol";
@@ -20,7 +20,7 @@ import {ERC1967Utils} from
     "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-/// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/proposals/sips/SIP02.sol:SIP02 -vvvv
+/// DO_RUN=false DO_BUILD=false DO_DEPLOY=true DO_SIMULATE=false DO_PRINT=false DO_VALIDATE=true forge script src/exercises/02/SIP02.sol:SIP02 -vvvv
 contract SIP02 is GovernorBravoProposal {
     using ForkSelector for uint256;
 
@@ -140,7 +140,6 @@ contract SIP02 is GovernorBravoProposal {
             1_000_000e18,
             "Max supply should be 1,000,000 USDC"
         );
-        // fails as slot for totalSupplied is changed
         assertEq(
             vault.totalSupplied(),
             1_000e18,

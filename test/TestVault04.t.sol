@@ -5,8 +5,8 @@ import {SafeERC20} from
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Test} from "@forge-std/Test.sol";
 
+import {SIP02} from "src/exercises/02/SIP02.sol";
 import {Vault04} from "src/exercises/04/Vault04.sol";
-import {SIP02} from "src/proposals/sips/SIP02.sol";
 
 contract TestVault04 is Test, SIP02 {
     using SafeERC20 for IERC20;
