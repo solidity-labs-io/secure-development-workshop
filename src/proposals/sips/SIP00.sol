@@ -3,9 +3,10 @@ pragma solidity ^0.8.0;
 
 import {GovernorBravoProposal} from
     "@forge-proposal-simulator/src/proposals/GovernorBravoProposal.sol";
-import {Addresses} from "@forge-proposal-simulator/addresses/Addresses.sol";
+import {Addresses} from
+    "@forge-proposal-simulator/addresses/Addresses.sol";
 
-import {Vault} from "src/examples/00/Vault00.sol";
+import {Vault} from "src/exercises/00/Vault00.sol";
 import {MockToken} from "@mocks/MockToken.sol";
 import {ForkSelector, ETHEREUM_FORK_ID} from "@test/utils/Forks.sol";
 
@@ -14,7 +15,6 @@ contract SIP00 is GovernorBravoProposal {
     using ForkSelector for uint256;
 
     constructor() {
-        // ETHEREUM_FORK_ID.createForksAndSelect();
         primaryForkId = ETHEREUM_FORK_ID;
     }
 
@@ -32,7 +32,12 @@ contract SIP00 is GovernorBravoProposal {
         return "SIP-00 System Deploy";
     }
 
-    function description() public pure override returns (string memory) {
+    function description()
+        public
+        pure
+        override
+        returns (string memory)
+    {
         return name();
     }
 

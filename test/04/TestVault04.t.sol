@@ -5,7 +5,7 @@ import {SafeERC20} from
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Test} from "@forge-std/Test.sol";
 
-import {Vault04} from "src/examples/04/vault04.sol";
+import {Vault04} from "src/exercises/04/vault04.sol";
 import {SIP02} from "src/proposals/sips/SIP02.sol";
 
 contract TestVault04 is Test, SIP02 {
@@ -58,8 +58,14 @@ contract TestVault04 is Test, SIP02 {
 
         vault.withdraw(dai, daiDepositAmount);
 
-        assertEq(vault.balanceOf(address(this)), 0, "vault dai balance not 0");
-        assertEq(vault.totalSupplied(), 0, "vault total supplied not 0");
+        assertEq(
+            vault.balanceOf(address(this)),
+            0,
+            "vault dai balance not 0"
+        );
+        assertEq(
+            vault.totalSupplied(), 0, "vault total supplied not 0"
+        );
         assertEq(
             IERC20(dai).balanceOf(address(this)),
             daiDepositAmount,
@@ -72,11 +78,14 @@ contract TestVault04 is Test, SIP02 {
         vault.withdraw(usdc, usdcDepositAmount);
     }
 
-    function _vaultDeposit(address token, address sender, uint256 amount)
-        private
-    {
+    function _vaultDeposit(
+        address token,
+        address sender,
+        uint256 amount
+    ) private {
         uint256 startingTotalSupplied = vault.totalSupplied();
-        uint256 startingTotalBalance = IERC20(token).balanceOf(address(vault));
+        uint256 startingTotalBalance =
+            IERC20(token).balanceOf(address(vault));
         uint256 startingUserBalance = vault.balanceOf(sender);
 
         deal(token, sender, amount);

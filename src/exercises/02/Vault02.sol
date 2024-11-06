@@ -4,12 +4,10 @@ import {IERC20Metadata} from
     "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {SafeERC20} from
     "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
-
-/// @notice Add maxsupply to the vault and update getNormalizedAmount logic
-contract Vault04 is OwnableUpgradeable {
+contract Vault is Ownable {
     using SafeERC20 for IERC20;
 
     /// @notice Mapping of authorized tokens
@@ -17,9 +15,6 @@ contract Vault04 is OwnableUpgradeable {
 
     /// @notice User's balance of all tokens deposited in the vault
     mapping(address => uint256) public balanceOf;
-
-    /// @notice Maximum amount of tokens that can be supplied to the vault
-    uint256 public maxSupply;
 
     /// @notice Total amount of tokens supplied to the vault
     ///
@@ -48,16 +43,10 @@ contract Vault04 is OwnableUpgradeable {
     event TokenAdded(address indexed token);
 
     /// @notice Construct the vault with a list of authorized tokens
-    constructor (){
-        _disableInitializers();
-    }
-
-    /// @notice Initialize the vault with a list of authorized tokens
     /// @param _tokens The list of authorized tokens
-    /// @param _owner The owner address to set for the contract
-    function initialize(address[] memory _tokens, address _owner) external initializer {
-        __Ownable_init(_owner);
-
+    constructor(address[] memory _tokens, address _owner)
+        Ownable(_owner)
+    {
         for (uint256 i = 0; i < _tokens.length; i++) {
             require(
                 IERC20Metadata(_tokens[i]).decimals() <= 18,
@@ -84,7 +73,9 @@ contract Vault04 is OwnableUpgradeable {
             IERC20Metadata(token).decimals() <= 18,
             "Vault: unsupported decimals"
         );
-        require(!authorizedToken[token], "Vault: token already authorized");
+        require(
+            !authorizedToken[token], "Vault: token already authorized"
+        );
 
         authorizedToken[token] = true;
 
@@ -113,7 +104,9 @@ contract Vault04 is OwnableUpgradeable {
 
         totalSupplied += normalizedAmount;
 
-        IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
+        IERC20(token).safeTransferFrom(
+            msg.sender, address(this), amount
+        );
 
         emit Deposit(token, msg.sender, amount);
     }
@@ -146,12 +139,6 @@ contract Vault04 is OwnableUpgradeable {
         emit Withdraw(token, msg.sender, amount);
     }
 
-    /// @notice Set the maximum supply of the vault
-    /// @param _maxSupply The maximum supply of the vault
-    function setMaxSupply(uint256 _maxSupply) external onlyOwner {
-        maxSupply = _maxSupply;
-    }
-
     /// --------------------------------------------------------
     /// --------------------------------------------------------
     /// ----------------- PUBLIC VIEW FUNCTION -----------------
@@ -168,7 +155,7 @@ contract Vault04 is OwnableUpgradeable {
         returns (uint256 normalizedAmount)
     {
         uint8 decimals = IERC20Metadata(token).decimals();
-        // normalizedAmount = amount;
+        normalizedAmount = amount;
         if (decimals < 18) {
             normalizedAmount = amount * (10 ** (18 - decimals));
         }
