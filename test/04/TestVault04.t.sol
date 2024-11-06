@@ -39,6 +39,7 @@ contract TestVault04 is Test, SIP02 {
         vm.startPrank(addresses.getAddress("DEPLOYER_EOA"));
         deploy();
         vm.stopPrank();
+
         dai = addresses.getAddress("DAI");
         usdc = addresses.getAddress("USDC");
         usdt = addresses.getAddress("USDT");
@@ -75,6 +76,7 @@ contract TestVault04 is Test, SIP02 {
 
     function testWithdrawAlreadyDepositedUSDC() public {
         uint256 usdcDepositAmount = 1_000e6;
+        _vaultDeposit(usdc, address(this), usdcDepositAmount);
         vault.withdraw(usdc, usdcDepositAmount);
     }
 
@@ -102,14 +104,16 @@ contract TestVault04 is Test, SIP02 {
         vault.deposit(token, amount);
         vm.stopPrank();
 
+        uint256 normalizedAmount = vault.getNormalizedAmount(token, amount);
+
         assertEq(
             vault.balanceOf(sender),
-            startingUserBalance + amount,
+            startingUserBalance + normalizedAmount,
             "user vault balance not increased"
         );
         assertEq(
             vault.totalSupplied(),
-            startingTotalSupplied + amount,
+            startingTotalSupplied + normalizedAmount,
             "vault total supplied not increased by deposited amount"
         );
         assertEq(
