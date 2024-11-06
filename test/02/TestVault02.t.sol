@@ -39,13 +39,15 @@ contract TestVault02 is Test, SIP00 {
         /// run the proposal
         deploy();
 
-        /// validate the proposal
-        validate();
-
         dai = addresses.getAddress("DAI");
         usdc = addresses.getAddress("USDC");
         usdt = addresses.getAddress("USDT");
         vault = Vault(addresses.getAddress("V1_VAULT"));
+    }
+
+    function testValidate() public view {
+        /// validate the proposal
+        validate();
     }
 
     function testVaultDepositDai() public {
