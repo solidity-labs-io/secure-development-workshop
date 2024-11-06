@@ -87,12 +87,12 @@ contract TestVault02 is Test, SIP02 {
 
         assertEq(
             vault.balanceOf(address(this)),
-            usdtDepositAmount,
+            vault.getNormalizedAmount(usdt, usdtDepositAmount),
             "vault token balance not increased"
         );
         assertEq(
             vault.totalSupplied(),
-            usdtDepositAmount,
+            vault.getNormalizedAmount(usdt, usdtDepositAmount),
             "vault total supplied not increased"
         );
         assertEq(
