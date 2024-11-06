@@ -20,7 +20,7 @@ remappings = [
 fs_permissions = [{ access = "read", path = "./addresses/"}]
 
 [fmt]
-line_length = 80
+line_length = 70
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
 
