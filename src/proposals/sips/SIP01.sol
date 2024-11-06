@@ -51,11 +51,9 @@ contract SIP01 is GovernorBravoProposal {
 
     function deploy() public override {
         if (!addresses.isAddressSet("V1_VAULT")) {
-            address[] memory tokens = new address[](3);
+            address[] memory tokens = new address[](2);
             tokens[0] = addresses.getAddress("USDC");
-            // usdc added again instead of dai
-            tokens[1] = addresses.getAddress("USDC");
-            tokens[2] = addresses.getAddress("USDT");
+            tokens[1] = addresses.getAddress("USDT");
 
             Vault vault = new Vault(tokens);
 
@@ -72,14 +70,14 @@ contract SIP01 is GovernorBravoProposal {
             "USDC should be authorized"
         );
         assertEq(
-            vault.authorizedToken(addresses.getAddress("DAI")),
-            true,
-            "DAI should be authorized"
-        );
-        assertEq(
             vault.authorizedToken(addresses.getAddress("USDT")),
             true,
             "USDT should be authorized"
+        );
+        assertEq(
+            vault.authorizedToken(addresses.getAddress("DAI")),
+            true,
+            "DAI should be authorized"
         );
     }
 }
