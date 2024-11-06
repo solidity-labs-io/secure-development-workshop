@@ -4,12 +4,13 @@ import {SafeERC20} from
     "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {console} from "@forge-std/console.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 import {Test} from "@forge-std/Test.sol";
 
-import {Vault} from "src/examples/00/Vault00.sol";
-import {SIP00} from "src/proposals/sips/SIP00.sol";
+import {Vault} from "src/exercises/00/Vault00.sol";
+import {SIP00} from "src/exercises/00/SIP00.sol";
 
-contract TestSIP00 is Test, SIP00 {
+contract TestVault00 is Test, SIP00 {
     using SafeERC20 for IERC20;
 
     Vault public vault;
@@ -39,13 +40,15 @@ contract TestSIP00 is Test, SIP00 {
         /// run the proposal
         deploy();
 
-        /// validate the proposal
-        validate();
-
         dai = addresses.getAddress("DAI");
         usdc = addresses.getAddress("USDC");
         usdt = addresses.getAddress("USDT");
-        vault = Vault(addresses.getAddress("V1_VAULT"));
+        vault = Vault(addresses.getAddress("V0_VAULT"));
+    }
+
+    function testValidate() public view {
+        /// validate the proposal
+        validate();
     }
 
     function testVaultDepositDai() public {
@@ -73,7 +76,9 @@ contract TestSIP00 is Test, SIP00 {
 
         deal(usdt, address(this), usdtDepositAmount);
 
-        USDT(usdt).approve(addresses.getAddress("V1_VAULT"), usdtDepositAmount);
+        USDT(usdt).approve(
+            addresses.getAddress("V0_VAULT"), usdtDepositAmount
+        );
 
         /// this executes 3 state transitions:
         ///     1. deposit dai into the vault
@@ -105,8 +110,14 @@ contract TestSIP00 is Test, SIP00 {
 
         vault.withdraw(dai, daiDepositAmount);
 
-        assertEq(vault.balanceOf(address(this)), 0, "vault dai balance not 0");
-        assertEq(vault.totalSupplied(), 0, "vault total supplied not 0");
+        assertEq(
+            vault.balanceOf(address(this)),
+            0,
+            "vault dai balance not 0"
+        );
+        assertEq(
+            vault.totalSupplied(), 0, "vault total supplied not 0"
+        );
         assertEq(
             IERC20(dai).balanceOf(address(this)),
             daiDepositAmount,
@@ -138,18 +149,21 @@ contract TestSIP00 is Test, SIP00 {
         );
     }
 
-    function _vaultDeposit(address token, address sender, uint256 amount)
-        private
-    {
+    function _vaultDeposit(
+        address token,
+        address sender,
+        uint256 amount
+    ) private {
         uint256 startingTotalSupplied = vault.totalSupplied();
-        uint256 startingTotalBalance = IERC20(token).balanceOf(address(vault));
+        uint256 startingTotalBalance =
+            IERC20(token).balanceOf(address(vault));
         uint256 startingUserBalance = vault.balanceOf(sender);
 
         deal(token, sender, amount);
 
         vm.startPrank(sender);
         IERC20(token).safeIncreaseAllowance(
-            addresses.getAddress("V1_VAULT"), amount
+            addresses.getAddress("V0_VAULT"), amount
         );
 
         /// this executes 3 state transitions:

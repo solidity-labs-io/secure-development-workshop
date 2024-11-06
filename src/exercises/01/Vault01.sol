@@ -1,5 +1,7 @@
 pragma solidity 0.8.25;
 
+import {IERC20Metadata} from
+    "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol";
 import {SafeERC20} from
     "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -41,6 +43,10 @@ contract Vault {
     /// @param _tokens The list of authorized tokens
     constructor(address[] memory _tokens) {
         for (uint256 i = 0; i < _tokens.length; i++) {
+            require(
+                IERC20Metadata(_tokens[i]).decimals() <= 18,
+                "unsupported decimals"
+            );
             authorizedToken[_tokens[i]] = true;
         }
     }
@@ -51,15 +57,19 @@ contract Vault {
     function deposit(address token, uint256 amount) external {
         require(authorizedToken[token], "Vault: token not authorized");
 
+        uint256 normalizedAmount = getNormalizedAmount(token, amount);
+
         /// save on gas by using unchecked, no need to check for overflow
         /// as all deposited tokens are whitelisted
         unchecked {
-            balanceOf[msg.sender] += amount;
+            balanceOf[msg.sender] += normalizedAmount;
         }
 
-        totalSupplied += amount;
+        totalSupplied += normalizedAmount;
 
-        IERC20(token).safeTransferFrom(msg.sender, address(this), amount);
+        IERC20(token).safeTransferFrom(
+            msg.sender, address(this), amount
+        );
 
         emit Deposit(token, msg.sender, amount);
     }
@@ -70,18 +80,47 @@ contract Vault {
     /// authorized token
     /// @param amount The amount to withdraw
     function withdraw(address token, uint256 amount) external {
-        /// both a check and an effect, ensures user has sufficient funds for withdrawal
-        balanceOf[msg.sender] -= amount;
+        require(authorizedToken[token], "Vault: token not authorized");
+
+        uint256 normalizedAmount = getNormalizedAmount(token, amount);
+
+        /// both a check and an effect, ensures user has sufficient funds for
+        /// withdrawal
+        /// must be checked for underflow as a user can only withdraw what they
+        /// have deposited
+        balanceOf[msg.sender] -= normalizedAmount;
 
         /// save on gas by using unchecked, no need to check for underflow
-        /// as all deposited tokens are whitelisted
+        /// as all deposited tokens are whitelisted, plus we know our invariant
+        /// always holds
         unchecked {
-            /// implicitly checks for balance
-            totalSupplied -= amount;
+            totalSupplied -= normalizedAmount;
         }
 
         IERC20(token).safeTransfer(msg.sender, amount);
 
         emit Withdraw(token, msg.sender, amount);
+    }
+
+    /// @notice public for testing purposes, returns the normalized amount of
+    /// tokens scaled to 18 decimals
+    /// @param token The token to deposit
+    /// @param amount The amount to deposit
+    function getNormalizedAmount(address token, uint256 amount)
+        public
+        view
+        returns (uint256 normalizedAmount)
+    {
+        uint8 decimals = IERC20Metadata(token).decimals();
+        if (decimals < 18) {
+            /// scale the amount to 18 decimals
+            /// unchecked because we know that the product will always be less
+            /// than 2^256-1 as 1e18 = $1
+            unchecked {
+                normalizedAmount = amount * (10 ** (18 - decimals));
+            }
+        } else if (decimals > 18) {
+            revert("Vault: unsupported decimals over 18");
+        }
     }
 }

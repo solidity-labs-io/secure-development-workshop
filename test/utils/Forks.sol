@@ -9,8 +9,9 @@ library ForkSelector {
         Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
 
     function createForksAndSelect(uint256 selectFork) internal {
-        (bool success,) =
-            address(vmContract).call(abi.encodeWithSignature("activeFork()"));
+        (bool success,) = address(vmContract).call(
+            abi.encodeWithSignature("activeFork()")
+        );
         (bool successSwitchFork,) = address(vmContract).call(
             abi.encodeWithSignature("selectFork(uint256)", selectFork)
         );
