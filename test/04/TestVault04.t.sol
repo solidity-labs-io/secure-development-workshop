@@ -104,7 +104,8 @@ contract TestVault04 is Test, SIP02 {
         vault.deposit(token, amount);
         vm.stopPrank();
 
-        uint256 normalizedAmount = vault.getNormalizedAmount(token, amount);
+        uint256 normalizedAmount =
+            vault.getNormalizedAmount(token, amount);
 
         assertEq(
             vault.balanceOf(sender),
