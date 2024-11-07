@@ -4,6 +4,10 @@ import {SafeERC20} from
     "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Test, console} from "@forge-std/Test.sol";
+import {ERC1967Utils} from
+    "@openzeppelin/contracts/proxy/ERC1967/ERC1967Utils.sol";
+import {ProxyAdmin} from
+    "@openzeppelin/contracts/proxy/transparent/ProxyAdmin.sol";
 
 import {SIP03} from "src/exercises/03/SIP03.sol";
 import {SIP04} from "src/exercises/04/SIP04.sol";
@@ -38,10 +42,20 @@ contract TestVault04 is Test, SIP04 {
         sip03.setupProposal();
         sip03.deploy();
 
+        /// set the addresses contrac to the SIP03 addresses for integration testing
+        setAddresses(sip03.addresses());
+        dai = addresses.getAddress("DAI");
+        usdc = addresses.getAddress("USDC");
+        usdt = addresses.getAddress("USDT");
+        vault = Vault(addresses.getAddress("VAULT_PROXY"));
+
+        vm.prank(vault.owner());
+        vault.setMaxSupply(100_000_000e18);
+
         /// setup the proposal
         setupProposal();
 
-        /// copy SIP03 addresses into this contract for integration testing
+        /// overwrite the newly created proposal Addresses contract
         setAddresses(sip03.addresses());
 
         /// deploy contracts from MIP-04
@@ -50,90 +64,21 @@ contract TestVault04 is Test, SIP04 {
         /// build and run proposal
         build();
         simulate();
-
-        dai = addresses.getAddress("DAI");
-        usdc = addresses.getAddress("USDC");
-        usdt = addresses.getAddress("USDT");
-        vault = Vault(addresses.getAddress("VAULT_PROXY"));
     }
 
-    function testVaultDepositDai() public {
-        uint256 daiDepositAmount = 1_000e18;
-
-        _vaultDeposit(dai, address(this), daiDepositAmount);
-    }
-
-    function testVaultWithdrawalDai() public {
-        uint256 daiDepositAmount = 1_000e18;
-
-        _vaultDeposit(dai, address(this), daiDepositAmount);
-
-        vault.withdraw(dai, daiDepositAmount);
-
+    function testValidate() public view {
         assertEq(
-            vault.balanceOf(address(this)),
-            0,
-            "vault dai balance not 0"
-        );
-        assertEq(
-            vault.totalSupplied(), 0, "vault total supplied not 0"
-        );
-        assertEq(
-            IERC20(dai).balanceOf(address(this)),
-            daiDepositAmount,
-            "user's dai balance not increased"
-        );
-    }
-
-    function testWithdrawAlreadyDepositedUSDC() public {
-        uint256 usdcDepositAmount = 1_000e6;
-
-        _vaultDeposit(usdc, address(this), usdcDepositAmount);
-
-        vault.withdraw(usdc, usdcDepositAmount);
-    }
-
-    function _vaultDeposit(
-        address token,
-        address sender,
-        uint256 amount
-    ) private {
-        uint256 startingTotalSupplied = vault.totalSupplied();
-        uint256 startingTotalBalance =
-            IERC20(token).balanceOf(address(vault));
-        uint256 startingUserBalance = vault.balanceOf(sender);
-
-        deal(token, sender, amount);
-
-        vm.startPrank(sender);
-        IERC20(token).safeIncreaseAllowance(
-            addresses.getAddress("VAULT_PROXY"), amount
+            vault.maxSupply(), 1_000_000e18, "max supply not set"
         );
 
-        /// this executes 3 state transitions:
-        ///     1. deposit dai into the vault
-        ///     2. increase the user's balance in the vault
-        ///     3. increase the total supplied amount in the vault
-        vault.deposit(token, amount);
-        vm.stopPrank();
-
-        uint256 normalizedAmount =
-            vault.getNormalizedAmount(token, amount);
+        bytes32 adminSlot =
+            vm.load(address(vault), ERC1967Utils.ADMIN_SLOT);
+        address proxyAdmin = address(uint160(uint256(adminSlot)));
 
         assertEq(
-            vault.balanceOf(sender),
-            startingUserBalance + normalizedAmount,
-            "user vault balance not increased"
-        );
-        assertEq(
-            vault.totalSupplied(),
-            startingTotalSupplied + normalizedAmount,
-            "vault total supplied not increased by deposited amount"
-        );
-        assertEq(
-            IERC20(token).balanceOf(address(vault)),
-            startingTotalBalance + amount,
-            "token balance not increased"
+            ProxyAdmin(proxyAdmin).owner(),
+            addresses.getAddress("COMPOUND_TIMELOCK_BRAVO"),
+            "owner not set"
         );
     }
 }

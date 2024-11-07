@@ -12,7 +12,7 @@ import {Authorized} from "src/exercises/storage/Authorized.sol";
 contract VaultStoragePausable is
     OwnableUpgradeable,
     Supply,
+    Authorized,
     Balances,
-    PausableUpgradeable,
-    Authorized
+    PausableUpgradeable
 {}

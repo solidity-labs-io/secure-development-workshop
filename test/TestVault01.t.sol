@@ -2,13 +2,14 @@ pragma solidity ^0.8.0;
 
 import {SafeERC20} from
     "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
+import {console} from "@forge-std/console.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {Test} from "@forge-std/Test.sol";
 
-import {Vault} from "src/exercises/02/Vault02.sol";
-import {SIP02} from "src/exercises/02/SIP02.sol";
+import {Vault} from "src/exercises/01/Vault01.sol";
+import {SIP01} from "src/exercises/01/SIP01.sol";
 
-contract TestVault02 is Test, SIP02 {
+contract TestVault01 is Test, SIP01 {
     using SafeERC20 for IERC20;
 
     Vault public vault;
@@ -19,7 +20,6 @@ contract TestVault02 is Test, SIP02 {
     address public immutable userC = address(3333);
 
     /// @notice token addresses
-    address public dai;
     address public usdc;
     address public usdt;
 
@@ -38,21 +38,9 @@ contract TestVault02 is Test, SIP02 {
         /// run the proposal
         deploy();
 
-        dai = addresses.getAddress("DAI");
         usdc = addresses.getAddress("USDC");
         usdt = addresses.getAddress("USDT");
-        vault = Vault(addresses.getAddress("V2_VAULT"));
-    }
-
-    function testValidate() public view {
-        /// validate the proposal
-        validate();
-    }
-
-    function testVaultDepositDai() public {
-        uint256 daiDepositAmount = 1_000e18;
-
-        _vaultDeposit(dai, address(this), daiDepositAmount);
+        vault = Vault(addresses.getAddress("V1_VAULT"));
     }
 
     function testVaultDepositUsdc() public {
@@ -69,53 +57,52 @@ contract TestVault02 is Test, SIP02 {
         _vaultDeposit(usdc, userC, usdcDepositAmount);
     }
 
-    function testVaultDepositUsdt() public {
-        uint256 usdtDepositAmount = 1_000e6;
+    function testVaultWithdrawalUsdc() public {
+        uint256 usdcDepositAmount = 1_000e6;
 
-        deal(usdt, address(this), usdtDepositAmount);
+        _vaultDeposit(usdc, address(this), usdcDepositAmount);
 
-        USDT(usdt).approve(
-            addresses.getAddress("V2_VAULT"), usdtDepositAmount
-        );
-
-        vault.deposit(usdt, usdtDepositAmount);
-
-        assertEq(
-            vault.balanceOf(address(this)),
-            vault.getNormalizedAmount(usdt, usdtDepositAmount),
-            "vault token balance not increased"
-        );
-        assertEq(
-            vault.totalSupplied(),
-            vault.getNormalizedAmount(usdt, usdtDepositAmount),
-            "vault total supplied not increased"
-        );
-        assertEq(
-            IERC20(usdt).balanceOf(address(vault)),
-            usdtDepositAmount,
-            "token balance not increased"
-        );
-    }
-
-    function testVaultWithdrawalDai() public {
-        uint256 daiDepositAmount = 1_000e18;
-
-        _vaultDeposit(dai, address(this), daiDepositAmount);
-
-        vault.withdraw(dai, daiDepositAmount);
+        vault.withdraw(usdc, usdcDepositAmount);
 
         assertEq(
             vault.balanceOf(address(this)),
             0,
-            "vault dai balance not 0"
+            "vault usdc balance not 0"
         );
         assertEq(
             vault.totalSupplied(), 0, "vault total supplied not 0"
         );
         assertEq(
-            IERC20(dai).balanceOf(address(this)),
-            daiDepositAmount,
-            "user's dai balance not increased"
+            IERC20(usdc).balanceOf(address(this)),
+            usdcDepositAmount,
+            "user's usdc balance not increased"
+        );
+    }
+
+    function testVaultDepositUsdt() public {
+        uint256 usdtDepositAmount = 1_000e8;
+
+        _vaultDeposit(usdt, address(this), usdtDepositAmount);
+    }
+
+    function testVaultWithdrawalUsdt() public {
+        uint256 usdtDepositAmount = 1_000e8;
+
+        _vaultDeposit(usdt, address(this), usdtDepositAmount);
+        vault.withdraw(usdt, usdtDepositAmount);
+
+        assertEq(
+            vault.balanceOf(address(this)),
+            0,
+            "vault usdt balance not 0"
+        );
+        assertEq(
+            vault.totalSupplied(), 0, "vault total supplied not 0"
+        );
+        assertEq(
+            IERC20(usdt).balanceOf(address(this)),
+            usdtDepositAmount,
+            "user's usdt balance not increased"
         );
     }
 
@@ -144,7 +131,7 @@ contract TestVault02 is Test, SIP02 {
         assertEq(
             IERC20(usdt).balanceOf(userA),
             usdcDepositAmount,
-            "userB usdc balance not increased"
+            "userB usdt balance remains unchanged"
         );
     }
 
@@ -162,7 +149,7 @@ contract TestVault02 is Test, SIP02 {
 
         vm.startPrank(sender);
         IERC20(token).safeIncreaseAllowance(
-            addresses.getAddress("V2_VAULT"), amount
+            addresses.getAddress("V1_VAULT"), amount
         );
 
         /// this executes 3 state transitions:
